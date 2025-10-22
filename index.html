@@ -26,7 +26,16 @@
                 <button id="switch-camera-btn" class="btn btn-secondary">
                     <span>🔄</span> Đổi camera
                 </button>
+                <button id="upload-btn" class="btn btn-info">
+                    <span>📁</span> Tải ảnh lên
+                </button>
+                <button id="auto-mode-btn" class="btn btn-success">
+                    <span>🤖</span> Chế độ tự động
+                </button>
             </div>
+            <div id="countdown" class="countdown"></div>
+            <div id="auto-progress" class="auto-progress"></div>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
         </div>
 
         <!-- Filters Section -->
@@ -38,23 +47,49 @@
                 <button class="filter-btn" data-filter="sepia(100%)">Sepia</button>
                 <button class="filter-btn" data-filter="blur(3px)">Mờ</button>
                 <button class="filter-btn" data-filter="brightness(150%)">Sáng</button>
+                <button class="filter-btn" data-filter="brightness(70%)">Tối</button>
                 <button class="filter-btn" data-filter="contrast(200%)">Tương phản</button>
                 <button class="filter-btn" data-filter="saturate(200%)">Bão hòa</button>
+                <button class="filter-btn" data-filter="saturate(50%)">Nhạt</button>
                 <button class="filter-btn" data-filter="invert(100%)">Đảo màu</button>
-                <button class="filter-btn" data-filter="hue-rotate(180deg)">Xoay màu</button>
+                <button class="filter-btn" data-filter="hue-rotate(90deg)">Xoay màu 1</button>
+                <button class="filter-btn" data-filter="hue-rotate(180deg)">Xoay màu 2</button>
+                <button class="filter-btn" data-filter="hue-rotate(270deg)">Xoay màu 3</button>
+                <button class="filter-btn" data-filter="opacity(70%)">Trong suốt</button>
+                <button class="filter-btn" data-filter="blur(5px)">Mờ nặng</button>
+                <button class="filter-btn" data-filter="brightness(120%) contrast(150%)">Rực rỡ</button>
+                <button class="filter-btn" data-filter="grayscale(50%) sepia(50%)">Retro</button>
+                <button class="filter-btn" data-filter="contrast(150%) saturate(150%)">Sống động</button>
+                <button class="filter-btn" data-filter="brightness(110%) saturate(130%) contrast(110%)">Ấm áp</button>
+                <button class="filter-btn" data-filter="brightness(90%) saturate(110%) hue-rotate(180deg)">Lạnh</button>
+                <button class="filter-btn" data-filter="sepia(80%) saturate(150%)">Vintage</button>
+                <button class="filter-btn" data-filter="contrast(120%) brightness(110%)">Drama</button>
+                <button class="filter-btn" data-filter="grayscale(100%) contrast(150%)">Đen trắng cổ điển</button>
+                <button class="filter-btn" data-filter="saturate(200%) hue-rotate(50deg)">Nhiệt đới</button>
             </div>
         </div>
 
         <!-- Overlays Section -->
         <div class="overlays-section">
-            <h3>🖼️ Khung ảnh</h3>
+            <h3>🖼️ Khung ảnh & Hiệu ứng</h3>
             <div class="overlays-grid">
                 <button class="overlay-btn active" data-overlay="none">Không</button>
-                <button class="overlay-btn" data-overlay="frame1">Khung 1</button>
-                <button class="overlay-btn" data-overlay="frame2">Khung 2</button>
-                <button class="overlay-btn" data-overlay="frame3">Khung 3</button>
-                <button class="overlay-btn" data-overlay="hearts">Trái tim</button>
-                <button class="overlay-btn" data-overlay="stars">Ngôi sao</button>
+                <button class="overlay-btn" data-overlay="frame1">🟨 Vàng</button>
+                <button class="overlay-btn" data-overlay="frame2">💗 Hồng</button>
+                <button class="overlay-btn" data-overlay="frame3">⬜ Trắng</button>
+                <button class="overlay-btn" data-overlay="frame4">🌈 Gradient</button>
+                <button class="overlay-btn" data-overlay="frame5">💎 Kim cương</button>
+                <button class="overlay-btn" data-overlay="frame6">🎨 Nghệ thuật</button>
+                <button class="overlay-btn" data-overlay="frame7">🌸 Hoa văn</button>
+                <button class="overlay-btn" data-overlay="frame8">⭕ Tròn</button>
+                <button class="overlay-btn" data-overlay="frame9">📐 Góc cạnh</button>
+                <button class="overlay-btn" data-overlay="hearts">❤️ Trái tim</button>
+                <button class="overlay-btn" data-overlay="stars">⭐ Ngôi sao</button>
+                <button class="overlay-btn" data-overlay="sparkles">✨ Lấp lánh</button>
+                <button class="overlay-btn" data-overlay="confetti">🎉 Pháo hoa</button>
+                <button class="overlay-btn" data-overlay="flowers">🌺 Hoa</button>
+                <button class="overlay-btn" data-overlay="butterflies">🦋 Bướm</button>
+                <button class="overlay-btn" data-overlay="snowflakes">❄️ Tuyết</button>
             </div>
         </div>
 
@@ -62,7 +97,12 @@
         <div class="gallery-section">
             <div class="gallery-header">
                 <h3>🖼️ Gallery</h3>
-                <button id="clear-gallery" class="btn btn-danger">Xóa tất cả</button>
+                <div class="gallery-actions">
+                    <button id="download-all-btn" class="btn btn-success">
+                        <span>⬇️</span> Tải tất cả
+                    </button>
+                    <button id="clear-gallery" class="btn btn-danger">Xóa tất cả</button>
+                </div>
             </div>
             <div id="gallery" class="gallery-grid">
                 <!-- Captured images will appear here -->
