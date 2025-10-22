@@ -13,7 +13,10 @@
         <h1>📷 Photo Booth</h1>
 
         <!-- Camera Section -->
-        <div class="camera-section">
+        <div class="camera-section" id="camera-section">
+            <button id="toggle-camera-size" class="toggle-size-btn" title="Thu nhỏ/Phóng to">
+                <span id="toggle-icon">📐</span>
+            </button>
             <div class="video-wrapper">
                 <video id="video" autoplay playsinline></video>
                 <div class="overlay-frame" id="overlay"></div>
@@ -111,6 +114,22 @@
 
         <!-- Hidden Canvas -->
         <canvas id="canvas" style="display: none;"></canvas>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="image-modal" class="image-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close">&times;</span>
+            <img id="modal-image" src="" alt="Preview">
+            <div class="modal-actions">
+                <button id="modal-download" class="btn btn-success">
+                    <span>⬇️</span> Tải xuống
+                </button>
+                <button id="modal-delete" class="btn btn-danger">
+                    <span>🗑️</span> Xóa
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

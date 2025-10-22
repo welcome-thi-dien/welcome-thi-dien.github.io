@@ -30,15 +30,16 @@ This is a web-based Photo Booth application that allows users to capture photos 
 1. **Camera Access**: Uses MediaDevices API to access front/back camera
 2. **Extended Filters**: 24+ CSS filters including basic (grayscale, sepia, blur) and advanced combinations (vintage, drama, tropical, retro)
 3. **Rich Decorative Overlays**: 16+ canvas-based overlays including 9 frame styles (gold, pink, white, gradient, diamond, art, floral, circular, angular) and 7 emoji effects (hearts, stars, sparkles, confetti, flowers, butterflies, snowflakes)
-4. **Sticky Camera Section**: Camera controls stay visible on scroll for easy access
-5. **Image Capture**: Converts video frames to images with filters and overlays
-6. **Gallery Upload**: Upload images from device gallery and apply filters/overlays
-7. **Auto Mode**: Automated photo session - captures 10 photos with 10-second countdown between each
-8. **Batch Download**: Download all captured images at once
-9. **Enhanced Gallery**: Beautiful card-based layout with hover effects and smooth animations
-10. **Camera Switching**: Toggle between front and back cameras
-11. **Premium UI/UX**: Gradient buttons, smooth animations, custom scrollbar, and modern glass-morphism design
-12. **Fully Responsive**: Mobile-first approach with adaptive layouts and tablet optimization
+4. **Image Preview Modal**: Click any gallery image to open full-screen preview with download and delete options
+5. **Camera Minimize/Maximize Toggle**: Manual button to minimize camera to corner or maximize to full size without layout shifts
+6. **Image Capture**: Converts video frames to images with filters and overlays
+7. **Gallery Upload**: Upload images from device gallery and apply filters/overlays
+8. **Auto Mode**: Automated photo session - captures 10 photos with 10-second countdown between each
+9. **Batch Download**: Download all captured images at once
+10. **Enhanced Gallery**: Beautiful card-based layout with hover effects and smooth animations
+11. **Camera Switching**: Toggle between front and back cameras
+12. **Premium UI/UX**: Gradient buttons, smooth animations, custom scrollbar, and modern glass-morphism design
+13. **Fully Responsive**: Mobile-first approach with adaptive layouts and tablet optimization
 
 ## Code Style Guidelines
 
