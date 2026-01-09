@@ -1,138 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Booth App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cờ Vua Cho Em - Đánh Với Máy</title>
+  <link rel="stylesheet" href="examples/css/chessboard-0.3.0.min.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <div class="container">
-        <h1>📷 Photo Booth</h1>
+  <div class="page">
+    <header class="hero">
+      <p class="hero__tag">Cờ vua đánh với máy anh chế ra muahahaha</p>
+      <h1 class="hero__title">Cờ Vua Cho Em</h1>
+      <p class="hero__subtitle">
+        Dễ thương, dễ chơi, và đây là món quà nhỏ dành riêng cho em.
+      </p>
+      <div class="hero__controls">
+        <label class="control">
+          <span>Độ khó</span>
+          <select id="difficulty">
+            <option value="1">Dễ</option>
+            <option value="4" selected>Vừa</option>
+            <option value="7">Khó</option>
+            <option value="10">Rất khó</option>
+          </select>
+        </label>
+        <button id="hintBtn" class="btn btn--ghost">Gợi ý</button>
+        <button id="newGame" class="btn btn--primary">Ván mới</button>
+      </div>
+    </header>
 
-        <!-- Camera Section -->
-        <div class="camera-section" id="camera-section">
-            <button id="toggle-camera-size" class="toggle-size-btn" title="Thu nhỏ/Phóng to">
-                <span id="toggle-icon">📐</span>
-            </button>
-            <div class="video-wrapper">
-                <video id="video" autoplay playsinline></video>
-                <div class="overlay-frame" id="overlay"></div>
-            </div>
+    <main class="arena">
+      <section class="board-wrap">
+        <div id="board" class="board" aria-label="Bàn cờ vua"></div>
+        <div class="board__hint" id="boardHint">
+          Chọn quân cờ, sau đó chọn ô muốn đi.
+        </div>
+      </section>
 
-            <div class="controls">
-                <button id="capture-btn" class="btn btn-primary">
-                    <span>📸</span> Chụp ảnh
-                </button>
-                <button id="switch-camera-btn" class="btn btn-secondary">
-                    <span>🔄</span> Đổi camera
-                </button>
-                <button id="upload-btn" class="btn btn-info">
-                    <span>📁</span> Tải ảnh lên
-                </button>
-                <button id="auto-mode-btn" class="btn btn-success">
-                    <span>🤖</span> Chế độ tự động
-                </button>
+      <aside class="panel">
+        <div class="panel__card">
+          <h2>Trạng thái</h2>
+          <div class="status">
+            <div>
+              <p class="status__label">Lượt</p>
+              <p id="turn" class="status__value">Trắng</p>
             </div>
-            <div id="countdown" class="countdown"></div>
-            <div id="auto-progress" class="auto-progress"></div>
-            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            <div>
+              <p class="status__label">Combo yêu thương</p>
+              <p id="combo" class="status__value">0</p>
+            </div>
+          </div>
+          <div class="status status--line">
+            <p id="engineStatus">Đang tải máy đánh...</p>
+          </div>
         </div>
 
-        <!-- Filters Section -->
-        <div class="filters-section">
-            <h3>🎨 Bộ lọc</h3>
-            <div class="filters-grid">
-                <button class="filter-btn active" data-filter="none">Gốc</button>
-                <button class="filter-btn" data-filter="grayscale(100%)">Đen trắng</button>
-                <button class="filter-btn" data-filter="sepia(100%)">Sepia</button>
-                <button class="filter-btn" data-filter="blur(3px)">Mờ</button>
-                <button class="filter-btn" data-filter="brightness(150%)">Sáng</button>
-                <button class="filter-btn" data-filter="brightness(70%)">Tối</button>
-                <button class="filter-btn" data-filter="contrast(200%)">Tương phản</button>
-                <button class="filter-btn" data-filter="saturate(200%)">Bão hòa</button>
-                <button class="filter-btn" data-filter="saturate(50%)">Nhạt</button>
-                <button class="filter-btn" data-filter="invert(100%)">Đảo màu</button>
-                <button class="filter-btn" data-filter="hue-rotate(90deg)">Xoay màu 1</button>
-                <button class="filter-btn" data-filter="hue-rotate(180deg)">Xoay màu 2</button>
-                <button class="filter-btn" data-filter="hue-rotate(270deg)">Xoay màu 3</button>
-                <button class="filter-btn" data-filter="opacity(70%)">Trong suốt</button>
-                <button class="filter-btn" data-filter="blur(5px)">Mờ nặng</button>
-                <button class="filter-btn" data-filter="brightness(120%) contrast(150%)">Rực rỡ</button>
-                <button class="filter-btn" data-filter="grayscale(50%) sepia(50%)">Retro</button>
-                <button class="filter-btn" data-filter="contrast(150%) saturate(150%)">Sống động</button>
-                <button class="filter-btn" data-filter="brightness(110%) saturate(130%) contrast(110%)">Ấm áp</button>
-                <button class="filter-btn" data-filter="brightness(90%) saturate(110%) hue-rotate(180deg)">Lạnh</button>
-                <button class="filter-btn" data-filter="sepia(80%) saturate(150%)">Vintage</button>
-                <button class="filter-btn" data-filter="contrast(120%) brightness(110%)">Drama</button>
-                <button class="filter-btn" data-filter="grayscale(100%) contrast(150%)">Đen trắng cổ điển</button>
-                <button class="filter-btn" data-filter="saturate(200%) hue-rotate(50deg)">Nhiệt đới</button>
-            </div>
+        <div class="panel__card">
+          <h2>Thông điệp</h2>
+          <p id="message" class="message">
+            Chúc em vui vẻ. Thắng thua gì cũng có anh bên cạnh.
+          </p>
         </div>
 
-        <!-- Overlays Section -->
-        <div class="overlays-section">
-            <h3>🖼️ Khung ảnh & Hiệu ứng</h3>
-            <div class="overlays-grid">
-                <button class="overlay-btn active" data-overlay="none">Không</button>
-                <button class="overlay-btn" data-overlay="frame1">🟨 Vàng</button>
-                <button class="overlay-btn" data-overlay="frame2">💗 Hồng</button>
-                <button class="overlay-btn" data-overlay="frame3">⬜ Trắng</button>
-                <button class="overlay-btn" data-overlay="frame4">🌈 Gradient</button>
-                <button class="overlay-btn" data-overlay="frame5">💎 Kim cương</button>
-                <button class="overlay-btn" data-overlay="frame6">🎨 Nghệ thuật</button>
-                <button class="overlay-btn" data-overlay="frame7">🌸 Hoa văn</button>
-                <button class="overlay-btn" data-overlay="frame8">⭕ Tròn</button>
-                <button class="overlay-btn" data-overlay="frame9">📐 Góc cạnh</button>
-                <button class="overlay-btn" data-overlay="hearts">❤️ Trái tim</button>
-                <button class="overlay-btn" data-overlay="stars">⭐ Ngôi sao</button>
-                <button class="overlay-btn" data-overlay="sparkles">✨ Lấp lánh</button>
-                <button class="overlay-btn" data-overlay="confetti">🎉 Pháo hoa</button>
-                <button class="overlay-btn" data-overlay="flowers">🌺 Hoa</button>
-                <button class="overlay-btn" data-overlay="butterflies">🦋 Bướm</button>
-                <button class="overlay-btn" data-overlay="snowflakes">❄️ Tuyết</button>
-            </div>
+        <div class="panel__card">
+          <h2>Nước đi</h2>
+          <ol id="moves" class="moves"></ol>
         </div>
+      </aside>
+    </main>
+  </div>
 
-        <!-- Gallery Section -->
-        <div class="gallery-section">
-            <div class="gallery-header">
-                <h3>🖼️ Gallery</h3>
-                <div class="gallery-actions">
-                    <button id="download-all-btn" class="btn btn-success">
-                        <span>⬇️</span> Tải tất cả
-                    </button>
-                    <button id="clear-gallery" class="btn btn-danger">Xóa tất cả</button>
-                </div>
-            </div>
-            <div id="gallery" class="gallery-grid">
-                <!-- Captured images will appear here -->
-            </div>
-        </div>
-
-        <!-- Hidden Canvas -->
-        <canvas id="canvas" style="display: none;"></canvas>
+  <div id="resultModal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop"></div>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <p id="resultTitle" class="modal__title">Kết quả</p>
+      <p id="resultText" class="modal__text"></p>
+      <button id="closeModal" class="btn btn--primary">Đóng</button>
     </div>
+  </div>
 
-    <!-- Image Preview Modal -->
-    <div id="image-modal" class="image-modal">
-        <div class="modal-content">
-            <span class="modal-close" id="modal-close">&times;</span>
-            <img id="modal-image" src="" alt="Preview">
-            <div class="modal-actions">
-                <button id="modal-download" class="btn btn-success">
-                    <span>⬇️</span> Tải xuống
-                </button>
-                <button id="modal-delete" class="btn btn-danger">
-                    <span>🗑️</span> Xóa
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+  <script src="jquery-1.10.1.min.js"></script>
+  <script src="chessboard-0.3.0.min.js"></script>
+  <script src="chess.min.js"></script>
+  <script src="enginegame.js"></script>
+  <script src="app.js"></script>
 </body>
 
 </html>
