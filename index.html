@@ -1,91 +1,166 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cờ Vua Cho Em - Đánh Với Máy</title>
-  <link rel="stylesheet" href="examples/css/chessboard-0.3.0.min.css" />
+  <title>Happy Birthday, My Love</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Work+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body>
-  <div class="page">
-    <header class="hero">
-      <p class="hero__tag">Cờ vua đánh với máy anh chế ra muahahaha</p>
-      <h1 class="hero__title">Cờ Vua Cho Em</h1>
-      <p class="hero__subtitle">
-        Dễ thương, dễ chơi, và đây là món quà nhỏ dành riêng cho em.
-      </p>
-      <div class="hero__controls">
-        <label class="control">
-          <span>Độ khó</span>
-          <select id="difficulty">
-            <option value="1">Dễ</option>
-            <option value="4" selected>Vừa</option>
-            <option value="7">Khó</option>
-            <option value="10">Rất khó</option>
-          </select>
-        </label>
-        <button id="hintBtn" class="btn btn--ghost">Gợi ý</button>
-        <button id="newGame" class="btn btn--primary">Ván mới</button>
-      </div>
-    </header>
-
-    <main class="arena">
-      <section class="board-wrap">
-        <div id="board" class="board" aria-label="Bàn cờ vua"></div>
-        <div class="board__hint" id="boardHint">
-          Chọn quân cờ, sau đó chọn ô muốn đi.
-        </div>
-      </section>
-
-      <aside class="panel">
-        <div class="panel__card">
-          <h2>Trạng thái</h2>
-          <div class="status">
-            <div>
-              <p class="status__label">Lượt</p>
-              <p id="turn" class="status__value">Trắng</p>
-            </div>
-            <div>
-              <p class="status__label">Combo yêu thương</p>
-              <p id="combo" class="status__value">0</p>
-            </div>
-          </div>
-          <div class="status status--line">
-            <p id="engineStatus">Đang tải máy đánh...</p>
-          </div>
-        </div>
-
-        <div class="panel__card">
-          <h2>Thông điệp</h2>
-          <p id="message" class="message">
-            Chúc em vui vẻ. Thắng thua gì cũng có anh bên cạnh.
-          </p>
-        </div>
-
-        <div class="panel__card">
-          <h2>Nước đi</h2>
-          <ol id="moves" class="moves"></ol>
-        </div>
-      </aside>
-    </main>
+<body class="locked">
+  <div class="bg-shapes" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
   </div>
+  <div class="falling-hearts" aria-hidden="true" id="falling-hearts"></div>
 
-  <div id="resultModal" class="modal" aria-hidden="true">
-    <div class="modal__backdrop"></div>
-    <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
-      <p id="resultTitle" class="modal__title">Kết quả</p>
-      <p id="resultText" class="modal__text"></p>
-      <button id="closeModal" class="btn btn--primary">Đóng</button>
+  <div id="lock-screen" class="lock-screen" aria-modal="true" role="dialog">
+    <div class="lock-card">
+      <p class="eyebrow">Private</p>
+      <h2>Nhập mật khẩu</h2>
+      <p class="muted-note">Trang này chỉ dành cho em. Mật khẩu 6 số.</p>
+      <form id="lock-form">
+        <input id="lock-input" type="password" inputmode="numeric" autocomplete="off" placeholder="******"
+          aria-label="Mật khẩu" />
+        <button type="submit" class="btn">Mở khóa</button>
+      </form>
+      <p id="lock-error" class="lock-error hidden">Sai mật khẩu.</p>
     </div>
   </div>
 
-  <script src="jquery-1.10.1.min.js"></script>
-  <script src="chessboard-0.3.0.min.js"></script>
-  <script src="chess.min.js"></script>
-  <script src="enginegame.js"></script>
+  <header class="hero protected">
+    <div class="hero__backdrop-name" aria-hidden="true">Nguyễn&nbsp;Thị&nbsp;Duyên</div>
+    <div class="hero__text">
+      <p class="eyebrow">25.02.2000</p>
+      <h1>Chúc mừng sinh nhật Duyên</h1>
+      <p class="lede">Trang nhỏ này mình làm chỉ để nhắc em rằng em luôn là điều tuyệt vời nhất. Cảm ơn vì đã đến và làm
+        cuộc sống này rực rỡ hơn.</p>
+      <!-- <div class="cta-row">
+        <a class="btn" href="#video">Xem video</a>
+        <a class="btn btn--ghost" href="#pdf">Đọc thư</a>
+      </div> -->
+    </div>
+    <div class="hero__card" role="presentation">
+      <div class="card__inner">
+        <p class="card__eyebrow">Little timeline</p>
+        <p class="card__quote">“Ở cạnh em, mọi thứ đều dịu dàng.”</p>
+        <p class="card__small">Love, Me</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="carousel protected">
+    <div class="slides" id="slides">
+      <section id="video" class="slide panel">
+        <div class="panel__head">
+          <h2>Video chúc mừng</h2>
+          <p>Đoạn video nhỏ để em xem lại những khoảnh khắc mình đã đi qua.</p>
+        </div>
+        <div class="media-frame">
+          <video controls playsinline webkit-playsinline controlsList="nofullscreen" poster="assets/img/IMG_3860.png">
+            <source src="assets/video/DraftResource_1771239623.931971.mp4" type="video/mp4" />
+            Trình duyệt của em không hỗ trợ video.
+          </video>
+        </div>
+      </section>
+
+      <!-- <section id="pdf" class="slide panel">
+        <div class="panel__head">
+          <h2>Thư online</h2>
+          <p>PDF này có thể thay bằng thư tay của anh. Em có thể đọc trực tiếp, zoom, hoặc xem full screen.</p>
+        </div>
+        <div class="media-frame media-frame--pdf">
+          <div class="pdf-viewer" id="pdf-viewer">
+            <div class="pdf-toolbar">
+              <button type="button" id="pdf-zoom-out" aria-label="Thu nhỏ">−</button>
+              <span id="pdf-zoom-level">65%</span>
+              <button type="button" id="pdf-zoom-in" aria-label="Phóng to">+</button>
+              <button type="button" id="pdf-fullscreen" aria-label="Xem toàn màn hình">⛶</button>
+            </div>
+            <div class="pdf-canvas-wrap" id="pdf-canvas-wrap">
+              <canvas id="pdf-canvas" aria-label="Xem thư PDF"></canvas>
+            </div>
+            <p id="pdf-error" class="pdf-error hidden">Không hiển thị được PDF. <a id="pdf-fallback-link" href="#" target="_blank" rel="noopener">Mở trực tiếp</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Sự nghiệp</h2>
+          <p>Chúc em luôn vững vàng, mỗi bước đi đều sáng rõ và được ghi nhận xứng đáng.</p>
+        </div>
+        <p class="wish__text">Mong em luôn có những dự án khiến em tự hào, đồng đội tốt, và mọi nỗ lực đều được tưởng thưởng. Anh tin em sẽ tỏa sáng theo cách riêng của mình.</p>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Sức khỏe</h2>
+          <p>Điều quan trọng nhất là em luôn khỏe mạnh và tràn đầy năng lượng.</p>
+        </div>
+        <p class="wish__text">Chúc em ngủ ngon, ăn ngon, tập luyện đều đặn. Mỗi sáng thức dậy đều thấy cơ thể nhẹ nhàng và tâm trí sáng trong.</p>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Gia đình</h2>
+          <p>Gia đình là nơi em luôn được yêu thương vô điều kiện.</p>
+        </div>
+        <p class="wish__text">Mong nhà mình luôn an yên, tiếng cười nhiều hơn, những bữa cơm ấm áp hơn, và em luôn thấy mình được chở che.</p>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Tình yêu</h2>
+          <p>Hai đứa mình sẽ cùng nhau đi qua mọi mùa.</p>
+        </div>
+        <p class="wish__text">Chúc tụi mình luôn kiên nhẫn, bao dung, và không ngừng học cách yêu nhau tốt hơn mỗi ngày. Anh yêu em.</p>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Bạn bè & Niềm vui</h2>
+          <p>Những người bạn tốt và những cuộc hẹn vui vẻ giữ em luôn tươi tắn.</p>
+        </div>
+        <p class="wish__text">Mong em luôn có những buổi cà phê, những chuyến đi, những câu chuyện dài khiến em cười sảng khoái.</p>
+      </section>
+
+      <section class="slide panel wish">
+        <div class="panel__head">
+          <h2>Những chuyến đi</h2>
+          <p>Cùng nhau gom thêm thật nhiều ký ức mới.</p>
+        </div>
+        <p class="wish__text">Hãy lên lịch cho những nơi em muốn đặt chân tới, từ biển xanh đến rừng núi, để mỗi năm nhìn lại đều có câu chuyện để kể.</p>
+      </section> -->
+
+      <section id="story" class="slide panel">
+        <div class="panel__head">
+          <h2>Story ảnh</h2>
+          <p>Những tấm hình em muốn giữ lại—hiệu ứng rơi tim vẫn ở đây cho đúng mood.</p>
+        </div>
+        <div class="story-rain" id="story-rain"></div>
+        <p class="muted-note">Danh sach anh lay tu <code>assets/story-image/manifest.json</code>. Anh se roi ngau nhien
+          khi den slide nay.</p>
+      </section>
+    </div>
+
+    <div class="carousel-controls">
+      <button class="carousel-btn" id="carousel-prev" aria-label="Trang trước">←</button>
+      <div class="dots" id="carousel-dots" aria-hidden="true"></div>
+      <button class="carousel-btn" id="carousel-next" aria-label="Trang tiếp">→</button>
+    </div>
+  </main>
+
+  <footer class="footer protected">
+    <p>Luôn yêu em, hôm nay và mỗi ngày.</p>
+  </footer>
+
+  <script src="assets/js/pdf.min.js"></script>
   <script src="app.js"></script>
 </body>
 
