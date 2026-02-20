@@ -10,6 +10,10 @@ const lockForm = document.getElementById('lock-form');
 const lockInput = document.getElementById('lock-input');
 const lockError = document.getElementById('lock-error');
 const bodyEl = document.body;
+const musicBtn = document.getElementById('music-toggle');
+const musicEl = document.getElementById('bg-music');
+const ctaVideo = document.getElementById('cta-video');
+const ctaPdf = document.getElementById('cta-pdf');
 let current = 0;
 let storyRainTimer = null;
 let storyImages = [];
@@ -30,6 +34,7 @@ const goToSlide = (idx) => {
   const gap = parseFloat(getComputedStyle(slideTrack).columnGap || '0');
   const width = slideEls[0]?.getBoundingClientRect().width || 0;
   const offset = current * (width + gap);
+  slideTrack.style.transition = 'transform 320ms ease';
   slideTrack.style.transform = `translateX(-${offset}px)`;
   renderCarouselDots();
   syncStoryRainState();
@@ -42,17 +47,50 @@ prevBtn?.addEventListener('click', prevSlide);
 nextBtn?.addEventListener('click', nextSlide);
 
 let touchStartX = null;
-slideTrack?.addEventListener('touchstart', (e) => {
-  touchStartX = e.touches[0].clientX;
-});
-slideTrack?.addEventListener('touchend', (e) => {
-  if (touchStartX === null) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 60) {
+let touchStartY = null;
+const touchOptions = { passive: false, capture: true };
+const handlePointerStart = (x, y) => {
+  touchStartX = x;
+  touchStartY = y;
+};
+const handlePointerMove = (x, y, evt) => {
+  if (touchStartX === null || touchStartY === null) return;
+  const dx = x - touchStartX;
+  const dy = y - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+    evt.preventDefault(); // ưu tiên swipe ngang
+  }
+};
+const handlePointerEnd = (x, y) => {
+  if (touchStartX === null || touchStartY === null) return;
+  const dx = x - touchStartX;
+  const dy = y - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 25) {
     if (dx < 0) nextSlide();
     else prevSlide();
   }
   touchStartX = null;
+  touchStartY = null;
+};
+
+const pointerTargets = [slideTrack, document];
+pointerTargets.forEach((target) => {
+  target?.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    handlePointerStart(e.clientX, e.clientY);
+  }, touchOptions);
+  target?.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'touch') return;
+    handlePointerMove(e.clientX, e.clientY, e);
+  }, touchOptions);
+  target?.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'touch') return;
+    handlePointerEnd(e.clientX, e.clientY);
+  }, touchOptions);
+  target?.addEventListener('pointercancel', () => {
+    touchStartX = null;
+    touchStartY = null;
+  }, touchOptions);
 });
 
 document.addEventListener('keydown', (evt) => {
@@ -62,8 +100,37 @@ document.addEventListener('keydown', (evt) => {
 
 window.addEventListener('resize', () => goToSlide(current));
 
+ctaVideo?.addEventListener('click', () => goToSlide(slideEls.findIndex((s) => s.id === 'video')));
+ctaPdf?.addEventListener('click', () => goToSlide(slideEls.findIndex((s) => s.id === 'pdf')));
+
 renderCarouselDots();
 goToSlide(0);
+
+// Music toggle
+(() => {
+  if (!musicBtn || !musicEl) return;
+  const updateLabel = (playing) => {
+    musicBtn.textContent = playing ? 'Tắt nhạc' : 'Bật nhạc';
+  };
+  updateLabel(false);
+  let playing = false;
+
+  musicBtn.addEventListener('click', async () => {
+    try {
+      if (!playing) {
+        await musicEl.play();
+        playing = true;
+      } else {
+        musicEl.pause();
+        playing = false;
+      }
+      updateLabel(playing);
+    } catch (err) {
+      musicBtn.textContent = 'Mở nhạc (không được)';
+      console.error(err);
+    }
+  });
+})();
 
 // Gate with password
 (() => {
@@ -102,6 +169,7 @@ const zoomOutBtn = document.getElementById('pdf-zoom-out');
 const zoomInBtn = document.getElementById('pdf-zoom-in');
 const zoomLevelLabel = document.getElementById('pdf-zoom-level');
 const fullscreenBtn = document.getElementById('pdf-fullscreen');
+const downloadBtn = document.getElementById('pdf-download');
 const pdfError = document.getElementById('pdf-error');
 const pdfFallbackLink = document.getElementById('pdf-fallback-link');
 
@@ -115,17 +183,20 @@ const initPdf = async () => {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'assets/js/pdf.worker.min.js';
 
   let pdfDoc = null;
-  let scale = 0.65;
+  let scale = 0.55;
   const pageNum = 1;
 
   const renderPage = async () => {
     const page = await pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale });
     const context = pdfCanvas.getContext('2d');
-    pdfCanvas.width = viewport.width;
-    pdfCanvas.height = viewport.height;
+    const ratio = window.devicePixelRatio || 1;
+    pdfCanvas.width = viewport.width * ratio;
+    pdfCanvas.height = viewport.height * ratio;
     pdfCanvas.style.width = `${viewport.width}px`;
     pdfCanvas.style.height = `${viewport.height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.imageSmoothingEnabled = true;
     await page.render({ canvasContext: context, viewport }).promise;
     zoomLevelLabel.textContent = `${Math.round(scale * 100)}%`;
   };
@@ -145,11 +216,26 @@ const initPdf = async () => {
 
   fullscreenBtn?.addEventListener('click', () => {
     const el = pdfCanvasWrap;
-    if (!document.fullscreenElement) {
-      el?.requestFullscreen?.();
+    const openFallback = () => window.open(pdfUrl, '_blank');
+    if (!document.fullscreenElement && el) {
+      const req = el.requestFullscreen?.() || el.webkitRequestFullscreen?.();
+      if (req && typeof req.then === 'function') {
+        req.catch(openFallback);
+      } else {
+        openFallback();
+      }
     } else {
       document.exitFullscreen?.();
     }
+  });
+
+  downloadBtn?.addEventListener('click', () => {
+    const a = document.createElement('a');
+    a.href = pdfUrl;
+    a.download = pdfUrl.split('/').pop() || 'letter.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   });
 };
 

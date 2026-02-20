@@ -24,6 +24,7 @@ body {
     radial-gradient(circle at 50% 70%, rgba(255, 122, 195, 0.12), transparent 38%),
     var(--bg);
   min-height: 100vh;
+  touch-action: pan-y pinch-zoom;
 }
 
 .bg-shapes {
@@ -128,6 +129,19 @@ body {
   font-size: 12px;
 }
 
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(255, 122, 195, 0.18), rgba(255, 210, 76, 0.14));
+  color: var(--text);
+  font-weight: 700;
+  font-size: 13px;
+}
+
 .cta-row {
   display: flex;
   gap: 12px;
@@ -158,6 +172,7 @@ body {
   box-shadow: none;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
+.music-btn { margin-left: auto; }
 
 .hero__card {
   background: var(--surface);
@@ -276,6 +291,12 @@ main { padding: clamp(16px, 3vw, 32px) clamp(24px, 5vw, 72px) 48px; }
   border: 1px solid rgba(255, 255, 255, 0.08);
   min-height: 60vh;
   overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+.media-frame--pdf {
+  touch-action: pan-y;
 }
 
 .pdf-canvas-wrap canvas {
@@ -351,19 +372,21 @@ main { padding: clamp(16px, 3vw, 32px) clamp(24px, 5vw, 72px) 48px; }
 .carousel {
   position: relative;
   overflow: hidden;
-  padding-bottom: 48px;
+  padding-bottom: 82px;
 }
 
 .slides {
   display: flex;
   column-gap: var(--slide-gap);
   transition: transform 420ms ease;
+  touch-action: pan-y;
 }
 
 .slide {
   min-width: 100%;
   box-sizing: border-box;
   margin-bottom: 0;
+  touch-action: pan-y;
 }
 
 .carousel-controls {
@@ -373,7 +396,12 @@ main { padding: clamp(16px, 3vw, 32px) clamp(24px, 5vw, 72px) 48px; }
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 10px 14px;
+  z-index: 6;
+  background: rgba(13, 10, 22, 0.35);
+  backdrop-filter: blur(8px);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .carousel-btn {
@@ -386,6 +414,7 @@ main { padding: clamp(16px, 3vw, 32px) clamp(24px, 5vw, 72px) 48px; }
   font-size: 18px;
   cursor: pointer;
   transition: transform 150ms ease, background 150ms ease;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 .carousel-btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.14); }
 
@@ -419,6 +448,13 @@ main { padding: clamp(16px, 3vw, 32px) clamp(24px, 5vw, 72px) 48px; }
   .media-frame video,
   .media-frame iframe { max-height: 75vh; }
   .pdf-toolbar { width: 100%; justify-content: center; }
+  .carousel-controls {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+  }
+  main { padding-bottom: 120px; }
 }
 .wish__text {
   font-size: 18px;
