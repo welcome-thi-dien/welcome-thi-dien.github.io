@@ -18,23 +18,30 @@
     <span></span><span></span><span></span><span></span>
   </div>
   <div class="falling-hearts" aria-hidden="true" id="falling-hearts"></div>
+  <div class="falling-words" aria-hidden="true" id="falling-words"></div>
+  <canvas id="confetti" class="confetti-canvas" aria-hidden="true"></canvas>
 
   <div id="lock-screen" class="lock-screen" aria-modal="true" role="dialog">
     <div class="lock-card">
       <p class="eyebrow">Private</p>
       <h2>Nhập mật khẩu</h2>
-      <p class="muted-note">Đoán mật khẩu iiiii</p>
+      <p class="muted-note">Trang này mở sau 00:00, 25/02/2026. Mật khẩu 6 số.</p>
       <form id="lock-form">
         <input id="lock-input" type="password" inputmode="numeric" autocomplete="off" placeholder="******"
           aria-label="Mật khẩu" />
         <button type="submit" class="btn">Mở khóa</button>
       </form>
       <p id="lock-error" class="lock-error hidden">Sai mật khẩu.</p>
+      <p id="lock-timer" class="muted-note hidden"></p>
     </div>
   </div>
 
   <header class="hero protected">
     <div class="hero__backdrop-name" aria-hidden="true">Nguyễn&nbsp;Thị&nbsp;Diên</div>
+    <div class="signature sig-img">
+      <img src="assets/svg/IMG_6632-removebg-preview.png" alt="From anh iu Di Mặn" />
+      <text x="20" y="105">From anh iu Di Mặn</text>
+    </div>
     <div class="hero__text">
       <div class="pill">Sinh nhật em Diên iu • 25.02.2000</div>
       <h1>Chúc mừng sinh nhật Diên</h1>
@@ -166,7 +173,6 @@
   <audio id="bg-music" preload="none" loop>
     <source src="assets/audio/song.mp3" type="audio/mpeg" />
   </audio>
-
   <script src="assets/js/pdf.min.js"></script>
   <script src="app.js"></script>
 </body>

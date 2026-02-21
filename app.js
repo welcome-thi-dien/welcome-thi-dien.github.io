@@ -14,10 +14,28 @@ const musicBtn = document.getElementById('music-toggle');
 const musicEl = document.getElementById('bg-music');
 const ctaVideo = document.getElementById('cta-video');
 const ctaPdf = document.getElementById('cta-pdf');
+const wordsContainer = document.getElementById('falling-words');
+const confettiCanvas = document.getElementById('confetti');
+const wishTexts = Array.from(document.querySelectorAll('.wish__text'));
+const heroBackdrop = document.querySelector('.hero__backdrop-name');
 let current = 0;
 let storyRainTimer = null;
 let storyImages = [];
 let syncStoryRainState = () => {};
+let musicAutoStarted = false;
+let wordsTimer = null;
+let typedSet = new WeakSet();
+
+function makeBurst() {
+  const burst = document.createElement('div');
+  burst.className = 'burst';
+  const x = Math.random() * 100;
+  const y = Math.random() * 100;
+  burst.style.setProperty('--bx', `${x}%`);
+  burst.style.setProperty('--by', `${y}%`);
+  document.body.appendChild(burst);
+  setTimeout(() => burst.remove(), 650);
+}
 
 const renderCarouselDots = () => {
   dotsNav.innerHTML = '';
@@ -38,6 +56,8 @@ const goToSlide = (idx) => {
   slideTrack.style.transform = `translateX(-${offset}px)`;
   renderCarouselDots();
   syncStoryRainState();
+  typeInSlide(slideEls[current]);
+  makeBurst();
 };
 
 const nextSlide = () => goToSlide(current + 1);
@@ -75,22 +95,38 @@ const handlePointerEnd = (x, y) => {
 
 const pointerTargets = [slideTrack, document];
 pointerTargets.forEach((target) => {
-  target?.addEventListener('pointerdown', (e) => {
-    if (e.pointerType !== 'touch') return;
-    handlePointerStart(e.clientX, e.clientY);
-  }, touchOptions);
-  target?.addEventListener('pointermove', (e) => {
-    if (e.pointerType !== 'touch') return;
-    handlePointerMove(e.clientX, e.clientY, e);
-  }, touchOptions);
-  target?.addEventListener('pointerup', (e) => {
-    if (e.pointerType !== 'touch') return;
-    handlePointerEnd(e.clientX, e.clientY);
-  }, touchOptions);
-  target?.addEventListener('pointercancel', () => {
-    touchStartX = null;
-    touchStartY = null;
-  }, touchOptions);
+  target?.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (e.pointerType !== 'touch') return;
+      handlePointerStart(e.clientX, e.clientY);
+    },
+    touchOptions,
+  );
+  target?.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.pointerType !== 'touch') return;
+      handlePointerMove(e.clientX, e.clientY, e);
+    },
+    touchOptions,
+  );
+  target?.addEventListener(
+    'pointerup',
+    (e) => {
+      if (e.pointerType !== 'touch') return;
+      handlePointerEnd(e.clientX, e.clientY);
+    },
+    touchOptions,
+  );
+  target?.addEventListener(
+    'pointercancel',
+    () => {
+      touchStartX = null;
+      touchStartY = null;
+    },
+    touchOptions,
+  );
 });
 
 document.addEventListener('keydown', (evt) => {
@@ -102,6 +138,27 @@ window.addEventListener('resize', () => goToSlide(current));
 
 ctaVideo?.addEventListener('click', () => goToSlide(slideEls.findIndex((s) => s.id === 'video')));
 ctaPdf?.addEventListener('click', () => goToSlide(slideEls.findIndex((s) => s.id === 'pdf')));
+
+// Typewriter for wish texts
+const typeInSlide = (slide) => {
+  if (!slide) return;
+  slide.querySelectorAll('.wish__text').forEach((p) => {
+    if (typedSet.has(p)) return;
+    const full = p.textContent;
+    p.textContent = '';
+    let idx = 0;
+    const step = () => {
+      if (idx <= full.length) {
+        p.textContent = full.slice(0, idx);
+        idx += 2;
+        requestAnimationFrame(step);
+      } else {
+        typedSet.add(p);
+      }
+    };
+    step();
+  });
+};
 
 renderCarouselDots();
 goToSlide(0);
@@ -130,12 +187,50 @@ goToSlide(0);
       console.error(err);
     }
   });
+  // expose helpers
+  window.__playMusic = async () => {
+    try {
+      await musicEl.play();
+      playing = true;
+      updateLabel(true);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  window.__pauseMusic = () => {
+    musicEl.pause();
+    playing = false;
+    updateLabel(false);
+  };
 })();
+
+// Voice note control
+const playVoiceNote = () => {};
+const stopVoiceNote = () => {};
 
 // Gate with password
 (() => {
   const PASS = '552025';
+  const BYPASS = '0964888301';
   const KEY = 'birthday-pass';
+  const RELEASE = new Date('2026-02-25T00:00:00');
+  const lockTimer = document.getElementById('lock-timer');
+
+  const showTimer = () => {
+    if (!lockTimer) return;
+    const now = new Date();
+    const diff = RELEASE - now;
+    if (diff <= 0) {
+      lockTimer.classList.add('hidden');
+      return;
+    }
+    const hours = Math.floor(diff / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    lockTimer.textContent = `Chỉ mở sau 00:00 25/02/2026. Còn ${hours}h ${mins}m.`;
+    lockTimer.classList.remove('hidden');
+  };
+
+  const canOpen = (val) => val === BYPASS || new Date() >= RELEASE;
 
   const unlock = () => {
     bodyEl.classList.remove('locked');
@@ -143,8 +238,11 @@ goToSlide(0);
     lockError?.classList.add('hidden');
   };
 
+  showTimer();
+
   const cached = localStorage.getItem(KEY);
-  if (cached === PASS) {
+  const openTimeReached = new Date() >= RELEASE;
+  if (cached === BYPASS || (openTimeReached && cached === PASS)) {
     unlock();
     return;
   }
@@ -152,13 +250,23 @@ goToSlide(0);
   lockForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     const val = (lockInput?.value || '').trim();
-    if (val === PASS) {
-      localStorage.setItem(KEY, PASS);
+    if (!canOpen(val)) {
+      showTimer();
+      lockError?.classList.remove('hidden');
+      lockError.textContent = 'Chưa đến 00:00 25/02/2026, chờ thêm nhé.';
+      return;
+    }
+    if (val === PASS || val === BYPASS) {
+      localStorage.setItem(KEY, val === PASS ? PASS : BYPASS);
       unlock();
     } else {
       lockError?.classList.remove('hidden');
+      lockError.textContent = 'Sai mật khẩu.';
     }
   });
+
+  // refresh countdown every minute
+  setInterval(showTimer, 60000);
 })();
 
 // PDF viewer (zoom + fullscreen) using PDF.js
@@ -297,8 +405,20 @@ if (storyRain) {
 
   syncStoryRainState = () => {
     const isStorySlide = slideEls[current]?.id === 'story';
-    if (isStorySlide) startStoryRain();
-    else stopStoryRain();
+    if (isStorySlide) {
+      startStoryRain();
+      startWords();
+      launchConfetti();
+      playVoiceNote();
+      if (!musicAutoStarted && typeof window.__playMusic === 'function') {
+        window.__playMusic();
+        musicAutoStarted = true;
+      }
+    } else {
+      stopStoryRain();
+      stopWords();
+      stopVoiceNote();
+    }
   };
 
   const showEmpty = () => {
@@ -328,6 +448,103 @@ if (storyRain) {
     }
   })();
 }
+
+// Falling words (for surprises)
+const wordList = [
+  'Happy birthday',
+  'chúc mừng chúng ta có nhau',
+  'iu em',
+  'thương em',
+  'wo ai ni',
+  'sa rang hê',
+  'miss u',
+  'love u sooooo much',
+  'em người iu sịn sịn',
+  'anh rất iu em',
+  'iu iu bbiu mùm thiu',
+  'toàn mùi mùm em',
+  'thiu éeeeeeeee',
+  'thúi quắc',
+  'Muahahahahahah'
+];
+
+const clearWords = () => {
+  wordsContainer?.querySelectorAll('.falling-word').forEach((el) => el.remove());
+};
+
+const spawnWord = () => {
+  if (!wordsContainer) return;
+  const text = wordList[Math.floor(Math.random() * wordList.length)];
+  const el = document.createElement('div');
+  el.className = 'falling-word';
+  el.textContent = text;
+  const left = Math.random() * 88;
+  const size = 14 + Math.random() * 10;
+  const dur = 6 + Math.random() * 4;
+  el.style.left = `${left}%`;
+  el.style.fontSize = `${size}px`;
+  el.style.setProperty('--word-dur', `${dur}s`);
+  wordsContainer.appendChild(el);
+  setTimeout(() => el.remove(), (dur + 0.5) * 1000);
+};
+
+const startWords = () => {
+  if (!wordsContainer || wordsTimer) return;
+  for (let i = 0; i < 6; i++) spawnWord();
+  wordsTimer = setInterval(spawnWord, 700);
+};
+
+const stopWords = () => {
+  if (wordsTimer) {
+    clearInterval(wordsTimer);
+    wordsTimer = null;
+  }
+  clearWords();
+};
+
+// Confetti
+let confettiCtx = null;
+let confettiActive = false;
+const launchConfetti = () => {
+  if (!confettiCanvas) return;
+  const ctx = confettiCtx || (confettiCtx = confettiCanvas.getContext('2d'));
+  const particles = Array.from({ length: 120 }, () => ({
+    x: Math.random() * confettiCanvas.width,
+    y: -20,
+    r: 2 + Math.random() * 3,
+    c: `hsl(${Math.random() * 360},80%,65%)`,
+    v: 2 + Math.random() * 3,
+    w: -2 + Math.random() * 4
+  }));
+  confettiActive = true;
+  const draw = () => {
+    if (!confettiActive) return;
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    particles.forEach((p) => {
+      p.y += p.v;
+      p.x += p.w;
+      if (p.y > confettiCanvas.height) p.y = -10;
+      ctx.fillStyle = p.c;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  };
+  draw();
+  setTimeout(() => {
+    confettiActive = false;
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }, 2200);
+};
+
+const resizeConfetti = () => {
+  if (!confettiCanvas) return;
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+};
+resizeConfetti();
+window.addEventListener('resize', resizeConfetti);
 
 // Falling hearts
 const heartsContainer = document.getElementById('falling-hearts');
